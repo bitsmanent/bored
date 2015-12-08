@@ -1,9 +1,10 @@
 Bored is a PHP micro-framework. It provides a simple framework but does not
 enforce any particular structure so you can bring things together in order to
-refine your own ad-hoc framework.
+refine your own ad-hoc framework. The main documentation is the source code.
 
 In a nutshell:
 ```
+<?php
 include('bored.php');
 
 route('GET', '/hello/!name', function($name) {
@@ -11,9 +12,8 @@ route('GET', '/hello/!name', function($name) {
 });
 
 bored_run();
+?>
 ```
-
-The main documentation is the source code.
 
 ### Concepts
 Things bored will never have:
@@ -26,18 +26,15 @@ Things bored will never have:
 * More than 2000 SLOC.
 
 ### Routing
-Routing handling. It works like this:
+It works like this:
 
 ```
-route('GET', '/hello/!name/?surname', function($name, $surname = '') {
-	$s = "Hello $name";
-	if($surname)
-		$s .= " $surname";
-	return $s;
+route('GET', '/hello/?name', function($name) {
+	return "Hello ${name}";
 });
 ```
 
-Argument prefixes means !mandatory and ?optional.
+Argument prefixes are: !mandatory and ?optional.
 
 ### Database
 Database facilities are based on the mysqli PHP extension. It mainly consists
@@ -65,11 +62,11 @@ Array
 Fetch multiple rows:
 ```
 $sql = "select id,username from users";
-$users = dbquery($sql, -1);
+$users = dbquery($sql, -1); /* -1 means no limit */
 print_r($users);
 ```
 
-This produces an output like this:
+This produces a output like this:
 
 ```
 Array
