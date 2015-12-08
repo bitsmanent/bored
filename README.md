@@ -19,8 +19,8 @@ bored_run();
 Things bored will never have:
 
 * An ORM
+* A templating system
 * Dependency injection
-* Templates system
 * Built-in database migration
 * Unit testing
 * More than 2000 SLOC.
