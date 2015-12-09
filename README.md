@@ -39,7 +39,19 @@ Argument prefixes are: !mandatory and ?optional.
 ### Database
 Database facilities are based on the mysqli PHP extension. It mainly consists
 of a single function dbquery() which allows few but very convenient ways to
-interact with the database. Some example:
+interact with the database. In order to enabled the database you have to define
+four constants:
+
+```
+define('DBHOST', '');
+define('DBUSER', '');
+define('DBPASS', '');
+define('DBNAME', '');
+```
+
+If one is missing, no DB connection gets opened and any call to dbquery() will
+fails.  Once all of the above has been defined a connection to the DB is made
+available and it's possible to use dbquery(). Keep reading.
 
 Fetch a single row:
 ```
@@ -66,7 +78,7 @@ $users = dbquery($sql, -1); /* -1 means no limit */
 print_r($users);
 ```
 
-This produces a output like this:
+This produces an output like this:
 
 ```
 Array
