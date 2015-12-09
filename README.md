@@ -118,7 +118,7 @@ Array
 ...
 
 ### Web server configuration
-I can't cover all scenarious, here is the most common where you a bored
+I can't cover all scenarious, here is the most common where there is a bored
 instance for a single domain:
 
 #### nginx
