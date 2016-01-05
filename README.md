@@ -118,24 +118,5 @@ Array
 ...
 
 ### Web server configuration
-I can't cover all scenarious, here is the most common where there is a bored
-instance for a single domain:
-
-#### nginx
-
-```
-server {
-        root /usr/share/nginx/www/bored/app/public/;
-        index index.html index.php;
-        server_name bored;
-
-        location / {
-                try_files $uri $uri/ /index.php?$args;
-                location ~ \.php$ {
-			fastcgi_pass unix:/var/run/php5-fpm.sock;
-                        fastcgi_param SCRIPT_FILENAME $request_filename;
-                        include fastcgi_params;
-                }
-        }
-}
-```
+There is no need to configure the web server at all, just include bored from
+your PHP project files and you're done.
