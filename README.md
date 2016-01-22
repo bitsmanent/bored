@@ -1,6 +1,6 @@
-Bored is a PHP micro-framework. It provides a simple framework but does not
-enforce any particular structure so you can bring things together in order to
-refine your own ad-hoc framework. The main documentation is the source code.
+Bored is a PHP micro-framework. It provides a simple framework but you can
+bring things together in order to refine your own ad-hoc framework; just don't
+call the bored_run() function. The main documentation is the source code.
 
 In a nutshell:
 ```
@@ -24,6 +24,8 @@ Things bored will never have:
 * Built-in database migration
 * Unit testing
 * More than 2000 SLOC.
+
+Keep reading to learn about what bored do have.
 
 ### Routing
 It works like this:
