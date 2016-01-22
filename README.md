@@ -116,7 +116,3 @@ Array
 
 #### Output formatting
 ...
-
-### Web server configuration
-There is no need to configure the web server at all, just include bored from
-your PHP project files and you're done.
