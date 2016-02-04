@@ -535,5 +535,4 @@ function bored_init() {
 	});
 }
 
-bored_init();
 ?>

@@ -7,6 +7,8 @@ In a nutshell:
 <?php
 include('bored.php');
 
+bored_init();
+
 route('GET', '/hello/!name', function($name) {
 	return "Hello ${name}";
 });
