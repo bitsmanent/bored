@@ -205,7 +205,10 @@ function dbupd($tbl, $info, $id) {
 	$vals = [];
 	foreach($info as $k => $v) {
 		$v = dbin($v);
-		$vals[] = "`$k`= '$v'";
+		if($v == NULL)
+			$vals[] = "`$k`= NULL";
+		else
+			$vals[] = "`$k`= '$v'";
 	}
 	$vals = implode(',', $vals);
 	$sql = "update `$tbl` set $vals where id = $id";
@@ -445,6 +448,23 @@ function humanstime($timestamp, $fmts = null) {
 	return sprintf($fmts[$k], $ht['unit']);
 }
 
+function curl_post($uri, $curlopts = []) {
+	$c = curl_init();
+
+	curl_setopt($c, CURLOPT_RETURNTRANSFER, 1);
+	curl_setopt($c, CURLOPT_URL, $uri);
+	curl_setopt($c, CURLOPT_POST, true);
+
+	if($curlopts)
+		foreach($curlopts as $k => $v)
+			curl_setopt($c, $k, $v);
+
+	$ret = curl_exec($c);
+	curl_close($c);
+
+	return $ret;
+}
+
 function prepare_form() {
 	$key = key($_FILES);
 	if(!$key)
@@ -516,7 +536,6 @@ function view($name, $data = [], $layout = null, $layoutdata = []) {
 	return viewlinc($name, $data, $layout, $layoutdata);
 }
 
-/* called by the app */
 function bored_run() {
 	echo route($_SERVER['REQUEST_METHOD'], (string)@explode('?', $_SERVER['REQUEST_URI'])[0]);
 }
