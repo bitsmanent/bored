@@ -201,17 +201,24 @@ function dbins($tbl, $info) {
 	return dbquery($sql);
 }
 
-function dbupd($tbl, $info, $id) {
+function dbupd($tbl, $info, $ids = NULL) {
 	$vals = [];
 	foreach($info as $k => $v) {
 		$v = dbin($v);
 		if($v == NULL)
-			$vals[] = "`$k`= NULL";
-		else
-			$vals[] = "`$k`= '$v'";
+			$v = 'NULL';
+		if($v != 'NULL' && $v != 'CURRENT_TIMESTAMP')
+			$v = "'$v'";
+		$vals[] = "`$k` = $v";
 	}
 	$vals = implode(',', $vals);
-	$sql = "update `$tbl` set $vals where id = $id";
+	$sql = "update `$tbl` set $vals";
+	if($ids) {
+		if(is_array($ids))
+			$sql .= " where id IN(".implode(',', $ids).")";
+		else
+			$sql .= " where id = $ids";
+	}
 	return dbquery($sql);
 }
 
@@ -547,9 +554,8 @@ function bored_init() {
 		dbopen(DBHOST, DBUSER, DBPASS, DBNAME);
 	register_shutdown_function(function() {
 		global $dblink;
-		if(!$dblink)
-			return;
-		mysqli_close($dblink);
+		if($dblink)
+			mysqli_close($dblink);
 		session_write_close();
 	});
 }
