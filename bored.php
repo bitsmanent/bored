@@ -529,7 +529,7 @@ function viewinc($name, $data = []) {
         return $d;
 }
 
-function viewlinc($name, $data = [], $layout = null, $layoutdata = []) {
+function lviewinc($name, $data = [], $layout = null, $layoutdata = []) {
 	if(!$layout) {
 		if(!defined('DEFAULT_LAYOUT'))
 			die('DEFAULT_LAYOUT not defined');
@@ -539,8 +539,8 @@ function viewlinc($name, $data = [], $layout = null, $layoutdata = []) {
 	return viewinc($layout, $layoutdata);
 }
 
-function view($name, $data = [], $layout = null, $layoutdata = []) {
-	return viewlinc($name, $data, $layout, $layoutdata);
+function view($name, $data = []) {
+	return lviewinc($name, $data, null, []);
 }
 
 function bored_run() {
