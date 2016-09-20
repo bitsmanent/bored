@@ -540,7 +540,7 @@ function lviewinc($name, $data = [], $layout = null, $layoutdata = []) {
 }
 
 function view($name, $data = []) {
-	return lviewinc($name, $data, null, []);
+	return lviewinc($name, $data, null, $data);
 }
 
 function bored_run() {
