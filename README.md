@@ -27,7 +27,7 @@ Things bored will never have:
 * Unit testing
 * More than 2000 SLOC.
 
-Keep reading to learn about what bored do have.
+Keep reading to learn about things bored do have.
 
 ### Routing
 It works like this:
