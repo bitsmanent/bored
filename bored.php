@@ -173,7 +173,7 @@ function dbping($l = null) {
 	return mysqli_ping($l);
 }
 
-function dberror($l = null) {
+function dberr($l = null) {
         if(!$l) {
                 global $dblink;
                 $l = $dblink;
@@ -182,48 +182,70 @@ function dberror($l = null) {
 }
 
 function dbin($s) {
-	return addslashes(htmlentities($s, ENT_QUOTES, 'UTF-8'));
+	if($s === NULL)
+		return "NULL";
+	if($s == "CURRENT_TIMESTAMP")
+		return $s;
+	return "'".addslashes(htmlentities($s, ENT_QUOTES, 'UTF-8'))."'";
 }
 
 function dbout($s) {
 	return stripslashes(html_entity_decode($s, ENT_QUOTES, 'UTF-8'));
 }
 
-function dbins($tbl, $info) {
+function dbput($tbl, $info) {
 	$vals = [];
-	foreach($info as $k => $v) {
-		$v = dbin($v);
-		$vals["`$k`"] = "'$v'";
-	}
+	foreach($info as $k => $v)
+		$vals["`$k`"] = dbin($v);
 	$sql = 'insert into `'.$tbl.'`
 		('.implode(',', array_keys($vals)).')
 		values ('.implode(',', array_values($vals)).')';
 	return dbquery($sql);
 }
 
-function dbupd($tbl, $info, $ids = NULL) {
-	$vals = [];
-	foreach($info as $k => $v) {
-		$v = dbin($v);
-		if($v == NULL)
-			$v = 'NULL';
-		if($v != 'NULL' && $v != 'CURRENT_TIMESTAMP')
-			$v = "'$v'";
-		$vals[] = "`$k` = $v";
+function dbids() {
+	/* Assuming transactional DB (InnoDB) */
+	$sql = "select LAST_INSERT_ID() as s,LAST_INSERT_ID() + ROW_COUNT() - 1 as e";
+	$t = dbquery($sql);
+	return range($t["s"], $t["e"]);
+}
+
+function dbins($tbl, $items) {
+	$values = [];
+	$fields = array_keys($items[0]);
+	foreach($items as $item) {
+		$vals = [];
+		foreach($item as $k => $v)
+			$vals[] = dbin($v);
+		$values[] = "(".implode(',', $vals).")";
 	}
-	$vals = implode(',', $vals);
-	$sql = "update `$tbl` set $vals";
-	if($ids) {
-		if(is_array($ids))
-			$sql .= " where id IN(".implode(',', $ids).")";
-		else
-			$sql .= " where id = $ids";
-	}
+	$sql = "insert into `$tbl` (".implode(',', $fields).") values ".implode(',', $values);
 	return dbquery($sql);
 }
 
-function dbdel($tbl, $id) {
-	$sql = "delete from `$tbl` where id = $id";
+function dbupd($tbl, $items, $pk = "id") {
+	$when = [];
+	$keys = array_keys($items[0]);
+	foreach($items as $item) {
+		$pv = $item[$pk];
+		foreach($keys as $k) {
+			if($k == $pk)
+				continue;
+			$v = dbin($item[$k]);
+			if(!isset($when[$k]))
+				$when[$k] = [];
+			$when[$k][] = "when $pv then $v";
+		}
+	}
+	$sets = [];
+	foreach($when as $k => $w)
+		$sets[] = "$k = case `$pk` ".implode(' ', $w)." else `$k` end";
+	$sql = "update `$tbl` set ".implode(',', $sets);
+	return dbquery($sql);
+}
+
+function dbdel($tbl, $ids, $pk = "id") {
+	$sql = "delete from `$tbl` where `$pk` IN(".implode(',', $ids).")";
 	return dbquery($sql);
 }
 
@@ -358,7 +380,7 @@ function jsonerr($v) {
 	json('ko', $v);
 }
 
-function jsonok($v) {
+function jsonok($v = "") {
 	json('ok', $v);
 }
 
@@ -482,13 +504,17 @@ function prepare_form() {
 		unset($_POST[$key]);
 	}
 	$ret = [];
-	foreach($files as $k => $unused) {
-		foreach($files[$k] as $i => $v) {
-			if(!isset($ret[$i]))
-				$ret[$i] = [];
-			$ret[$i][$k] = $v;
+	if(is_array($files['name'])) {
+		foreach($files as $k => $unused) {
+			foreach($files[$k] as $i => $v) {
+				if(!isset($ret[$i]))
+					$ret[$i] = [];
+				$ret[$i][$k] = $v;
+			}
 		}
 	}
+	else
+		$ret = [$files];
 	$_FILES = $ret;
 }
 
@@ -535,7 +561,8 @@ function lviewinc($name, $data = [], $layout = null, $layoutdata = []) {
 			die('DEFAULT_LAYOUT not defined');
 		$layout = DEFAULT_LAYOUT;
 	}
-	$layoutdata['content'] = viewinc($name, $data);
+	$layoutdata["viewname"] = $name;
+	$layoutdata["content"] = viewinc($name, $data);
 	return viewinc($layout, $layoutdata);
 }
 
