@@ -86,8 +86,8 @@ function route($method, $route, $func = null) {
         return 0;
 }
 
-function dbopen($host, $user, $pass, $dbname) {
-	if(!($r = @mysqli_connect($host, $user, $pass, $dbname)))
+function dbopen($host, $user, $pass, $name) {
+	if(!($r = @mysqli_connect($host, $user, $pass, $name)))
 		die('database error');
 	global $dblink;
 	$dblink = $r;
