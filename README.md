@@ -9,7 +9,7 @@ include('bored.php');
 
 bored_init();
 
-route('GET', '/hello/!name', function($name = "Friend") {
+route('GET', '/hello/!name', function($name) {
 	return "Hello ${name}";
 });
 
@@ -33,7 +33,7 @@ Keep reading to learn about things bored do have.
 It works like this:
 
 ```
-route('GET', '/hello/?name', function($name) {
+route('GET', '/hello/?name', function($name = "Friend") {
 	return "Hello ${name}";
 });
 ```
