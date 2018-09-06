@@ -480,17 +480,12 @@ function humanstime($timestamp, $fmts = null) {
 function curl_post($uri, $curlopts = []) {
 	$c = curl_init();
 
-	curl_setopt($c, CURLOPT_RETURNTRANSFER, 1);
-	curl_setopt($c, CURLOPT_URL, $uri);
-	curl_setopt($c, CURLOPT_POST, true);
-
-	if($curlopts)
-		foreach($curlopts as $k => $v)
-			curl_setopt($c, $k, $v);
-
+	$curlopts[CURLOPT_RETURNTRANSFER] = 1;
+	$curlopts[CURLOPT_URL] = $uri;
+	$curlopts[CURLOPT_POST] = 1;
+	curl_setopt_array($c, $curlopts);
 	$ret = curl_exec($c);
 	curl_close($c);
-
 	return $ret;
 }
 
