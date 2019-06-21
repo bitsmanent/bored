@@ -69,11 +69,8 @@ function route($method, $route, $func = null) {
 				$argv = [];
 			}
                 }
-		if(!$r || (count($argv) < $r['mandatory']) || (count($argv) > $r['argc'])) {
-			header($_SERVER['SERVER_PROTOCOL'].' 404 Not Found'); 
-			header("Status: 404 Not Found"); /* CGI */
-			exit(1);
-		}
+		if(!$r || (count($argv) < $r['mandatory']) || (count($argv) > $r['argc']))
+			exit(http_response_code(404));
                 return call_user_func_array($r['func'], $argv);
         }
         $name = [];
