@@ -46,12 +46,12 @@ $HT_DIVS = [
 	'now' => 0,
 ];
 
-$dblink = null;
+$dblink = NULL;
 
-function route($method, $route, $func = null) {
+function route($method, $route, $func = NULL) {
         static $routes = [];
         if(!$func) {
-                $r = null;
+                $r = NULL;
                 $n = '';
                 $argv = [];
                 foreach(explode('/', $route) as $arg) {
@@ -151,10 +151,10 @@ function dbquery($sql, $limit = 1, $multi = false) {
 		$ret = $res;
 		break;
 	}
-	return $ret;
+	return $limit == 1 ? $ret[0] : $ret;
 }
 
-function dbping($l = null) {
+function dbping($l = NULL) {
 	global $dblink;
 
         if(!$l)
@@ -162,7 +162,7 @@ function dbping($l = null) {
 	return mysqli_ping($l);
 }
 
-function dberr($l = null) {
+function dberr($l = NULL) {
 	global $dblink;
 
         if(!$l)
@@ -245,9 +245,9 @@ function sizefitbox($src, $dst) {
 	return "${w}x${h}";
 }
 
-function imgresize($src, $saveas, $whxy = '64x64-0,0', $opts = null) {
-	$in = null;
-	$out = null;
+function imgresize($src, $saveas, $whxy = '64x64-0,0', $opts = NULL) {
+	$in = NULL;
+	$out = NULL;
 	$transparency = false;
 	$ext = strtolower((string)@pathinfo($src)['extension']);
 	switch($ext) {
@@ -260,8 +260,8 @@ function imgresize($src, $saveas, $whxy = '64x64-0,0', $opts = null) {
 		$in = 'imagecreatefromgif';
 		$out = 'imagegif';
 		/* imagegif() doesn't take a third param */
-		if($opts !== null)
-			$opts = null;
+		if($opts !== NULL)
+			$opts = NULL;
 		break;
 	case 'bmp':
 		$in = 'imagecreatefromwbmp';
@@ -327,7 +327,7 @@ function imgresize($src, $saveas, $whxy = '64x64-0,0', $opts = null) {
 		imagecopyresampled($ni, $oi, 0, 0, 0, 0, $w, $h, $iw, $ih);
 	}
 	imagedestroy($oi);
-	if($opts !== null)
+	if($opts !== NULL)
 		$r = $out($ni, $saveas, $opts);
 	else
 		$r = $out($ni, $saveas);
@@ -349,7 +349,7 @@ function json($state, $res) {
 	die(json_encode(['state' => $state, 'res' => $res]));
 }
 
-function sendmail($from, $to, $subj, $message, $files = null) {
+function sendmail($from, $to, $subj, $message, $files = NULL) {
 	ini_set('sendmail_from', $from);
 	$headers = "From: $from\n" .
 		   "Return-Path: <$from>\r\n" .
@@ -382,28 +382,28 @@ function sendmail($from, $to, $subj, $message, $files = null) {
 	return @mail($to, $subj, $message, $headers);
 }
 
-function _store(&$to, $k, $v) {
-	$r = isset($to[$k]) ? $to[$k] : null;
-	if($v !== null)
+function store(&$to, $k, $v) {
+	$r = isset($to[$k]) ? $to[$k] : NULL;
+	if($v !== NULL)
 		$to[$k] = $v;
 	return $r;
 }
 
-function cache($k, $v = null) {
+function cache($k, $v = NULL) {
 	static $__cache = [];
-	return _store($__cache, $k, $v);
+	return store($__cache, $k, $v);
 }
 
-function sess($k, $v = null) {
-	$r = isset($_SESSION[$k]) ? $_SESSION[$k] : null;
-	return _store($_SESSION, $k, $v);
+function sess($k, $v = NULL) {
+	$r = isset($_SESSION[$k]) ? $_SESSION[$k] : NULL;
+	return store($_SESSION, $k, $v);
 }
 
 function pre($d) {
 	echo '<pre>'.print_r($d,1).'</pre>';
 }
 
-function humanstime($timestamp, $fmts = null) {
+function humanstime($timestamp, $fmts = NULL) {
 	global $HT_DEFAULT_FMTS, $HT_DIVS;
 
 	$divs = $HT_DIVS;
@@ -488,22 +488,21 @@ function buildhier($items, $pk = 'parent_id', $ck = 'id', $subk = 'children') {
 	return $items;
 }
 
-function viewinc($name, $data = []) {
+/* Note: all variables here are accessible by the view (along with globals) */
+function viewinc($incname, $viewdata = []) {
 	if(!defined("VIEWDIR"))
 		die("VIEWDIR not defined");
-        foreach($data as $k => $v)
-                ${$k} = $v;
-        $view = VIEWDIR.'/'.implode('/', explode('.', $name)).'.php';
-	if(!file_exists($view))
+        $viewfile = VIEWDIR.'/'.implode('/', explode('.', $incname)).'.php';
+	if(!file_exists($viewfile))
 		return NULL;
         ob_start();
-        require($view);
+        require($viewfile);
         $d = ob_get_contents();
         ob_end_clean();
         return $d;
 }
 
-function lviewinc($name, $data = [], $layout = null, $layoutdata = []) {
+function lviewinc($name, $data = [], $layout = NULL, $layoutdata = []) {
 	if(!$layout) {
 		if(!defined('DEFAULT_LAYOUT'))
 			die('DEFAULT_LAYOUT not defined');
@@ -512,13 +511,19 @@ function lviewinc($name, $data = [], $layout = null, $layoutdata = []) {
 	$content = viewinc($name, $data);
 	if($content === NULL)
 		return NULL;
-	$layoutdata["viewname"] = $name;
-	$layoutdata["content"] = $content;
-	return viewinc($layout, $layoutdata);
+	return viewinc($layout, [
+		"name" => $name,
+		"content" => $content,
+		"paths" => array_filter(explode('/', $_SERVER["REQUEST_URI"]), function($dir) {
+			return trim($dir);
+		})
+	]);
 }
 
-function view($name, $data = []) {
-	return lviewinc($name, $data, null, $data);
+function view($name, $data = [], $layout = NULL, $layoutdata = NULL) {
+	if(!$layoutdata)
+		$layoutdata = $data;
+	return lviewinc($name, $data, $layout, $layoutdata);
 }
 
 function bored_init() {
