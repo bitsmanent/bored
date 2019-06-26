@@ -439,26 +439,21 @@ function curl_post($uri, $curlopts = []) {
 }
 
 function prepare_form() {
-	$key = key($_FILES);
-	if(!$key)
-		return;
-	$files = @$_FILES[$key];
-	if(@$_POST[$key]) {
-		$files = array_merge($files, $_POST[$key]);
-		unset($_POST[$key]);
-	}
 	$ret = [];
-	if(is_array($files['name'])) {
-		foreach($files as $k => $unused) {
-			foreach($files[$k] as $i => $v) {
-				if(!isset($ret[$i]))
-					$ret[$i] = [];
-				$ret[$i][$k] = $v;
+	$idx = 0;
+	foreach($_FILES as $grp => $fds) {
+		foreach($fds as $k => $vals) {
+			foreach($vals as $i => $txt) {
+				$t = $idx + $i;
+				if(!isset($ret[$t])) {
+					$ret[$t] = [];
+					$ret[$t]["grp"] = $grp;
+				}
+				$ret[$t][$k] = $txt;
 			}
 		}
+		$idx += count($ret);
 	}
-	else
-		$ret = [$files];
 	$_FILES = $ret;
 }
 
