@@ -151,7 +151,7 @@ function dbquery($sql, $limit = 1, $multi = false) {
 		$ret = $res;
 		break;
 	}
-	return $limit == 1 ? $ret[0] : $ret;
+	return ($limit == 1 && is_array($ret) ? $ret[0] : $ret);
 }
 
 function dbping($l = NULL) {
