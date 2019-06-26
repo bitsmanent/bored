@@ -448,6 +448,10 @@ function prepare_form() {
 				if(!isset($ret[$t])) {
 					$ret[$t] = [];
 					$ret[$t]["grp"] = $grp;
+					/* related info */
+					$ret[$t]["info"] = [];
+					foreach((array)@$_POST[$grp] as $ik => $info)
+						$ret[$t]["info"][$ik] = $info[$t];
 				}
 				$ret[$t][$k] = $txt;
 			}
