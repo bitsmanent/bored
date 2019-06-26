@@ -497,8 +497,9 @@ function viewinc($incname, $viewdata = []) {
 		return NULL;
 
 	/* only provide specified variable names */
-	foreach($viewdata as $k => $v)
-		${$k} = $v;
+	if($viewdata)
+		foreach($viewdata as $k => $v)
+			${$k} = $v;
 	unset($viewdata);
 	unset($incname);
 
