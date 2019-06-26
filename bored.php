@@ -495,6 +495,13 @@ function viewinc($incname, $viewdata = []) {
         $viewfile = VIEWDIR.'/'.implode('/', explode('.', $incname)).'.php';
 	if(!file_exists($viewfile))
 		return NULL;
+
+	/* only provide specified variable names */
+	foreach($viewdata as $k => $v)
+		${$k} = $v;
+	unset($viewdata);
+	unset($incname);
+
         ob_start();
         require($viewfile);
         $d = ob_get_contents();
