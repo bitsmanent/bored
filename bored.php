@@ -456,6 +456,7 @@ function prepare_form() {
 				$ret[$t][$k] = $txt;
 			}
 		}
+		unset($_POST[$grp]); /* get rid of files-related POST data */
 		$idx += count($ret);
 	}
 	$_FILES = $ret;
