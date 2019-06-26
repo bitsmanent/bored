@@ -171,15 +171,13 @@ function dberr($l = NULL) {
 }
 
 function dbin($s) {
+	global $dblink;
+
 	if($s === NULL)
 		return "NULL";
 	if($s == "CURRENT_TIMESTAMP")
 		return $s;
-	return "'".addslashes(htmlentities($s, ENT_QUOTES, 'UTF-8'))."'";
-}
-
-function dbout($s) {
-	return stripslashes(html_entity_decode($s, ENT_QUOTES, 'UTF-8'));
+	return "'".mysqli_real_escape_string($dblink, $s)."'";
 }
 
 function dbids() {
