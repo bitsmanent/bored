@@ -202,13 +202,20 @@ function dbins($tbl, $items) {
 
 function dbupd($tbl, $items, $pk = "id") {
 	$when = [];
-	$keys = array_keys($items[0]);
+
+	/* collects longest available set of keys */
+	$keys = [];
+	foreach($items as $item)
+		foreach($item as $k => $v)
+			$keys[$k] = 1;
+	$keys = array_keys($keys);
+
 	foreach($items as $item) {
 		$pv = $item[$pk];
 		foreach($keys as $k) {
 			if($k == $pk)
 				continue;
-			$v = dbin($item[$k]);
+			$v = isset($item[$k]) ? dbin($item[$k]) : "`${k}`";
 			if(!isset($when[$k]))
 				$when[$k] = [];
 			$when[$k][] = "when $pv then $v";
@@ -450,8 +457,13 @@ function prepare_form() {
 					$ret[$t]["grp"] = $grp;
 					/* related info */
 					$ret[$t]["info"] = [];
-					foreach((array)@$_POST[$grp] as $ik => $info)
+					foreach((array)@$_POST[$grp] as $ik => $info) {
+						if(!isset($info[$t])) {
+							/* XXX warn the user: possible fields mismatch */
+							continue;
+						}
 						$ret[$t]["info"][$ik] = $info[$t];
+					}
 				}
 				$ret[$t][$k] = $txt;
 			}
