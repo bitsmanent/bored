@@ -254,7 +254,11 @@ function imgresize($src, $saveas, $whxy = '64x64-0,0', $opts = NULL) {
 	$in = NULL;
 	$out = NULL;
 	$transparency = false;
-	$ext = strtolower((string)@pathinfo($src)['extension']);
+
+	$t = finfo_file(finfo_open(FILEINFO_MIME_TYPE), $src);
+	$ext = explode('/', $t)[1];
+	//$ext = strtolower((string)@pathinfo($src)['extension']);
+
 	switch($ext) {
 	case 'jpg':
 	case 'jpeg':
