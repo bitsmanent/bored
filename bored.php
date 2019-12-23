@@ -218,7 +218,7 @@ function dbupd($tbl, $items, $pk = "id") {
 			$v = isset($item[$k]) ? dbin($item[$k]) : "`${k}`";
 			if(!isset($when[$k]))
 				$when[$k] = [];
-			$when[$k][] = "when $pv then $v";
+			$when[$k][] = "when '$pv' then $v";
 		}
 	}
 	$sets = [];
